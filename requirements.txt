@@ -1,0 +1,11 @@
+# Core OCR and image processing dependencies
+opencv-python>=4.5.0
+numpy>=1.19.0
+pytesseract>=0.3.8
+Pillow>=8.0.0
+
+# File sorting utilities
+natsort>=8.4.0
+
+# Optional: PDF support (install separately with: pip install pymupdf4llm)
+# pymupdf4llm>=0.3.0
