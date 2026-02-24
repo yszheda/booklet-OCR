@@ -76,6 +76,23 @@ class ObsidianMarkdownGenerator:
 
                 merged_text = self._clean_text(merged_text)
                 if merged_text:
+                    # Special formatting for title and author
+                    if 'THEARTOFFUGUE' in merged_text:
+                        merged_text = merged_text.replace('THEARTOFFUGUE', 'THE ART OF FUGUE')
+                    if '+JOHANN SEBASTIAN BACH+' in merged_text:
+                        merged_text = merged_text.replace('+JOHANN SEBASTIAN BACH+', u'♪ JOHANN SEBASTIAN BACH ♪')
+
+                    if 'THEARTOFFUGUE' in merged_text:
+                        merged_text = merged_text.replace('THEARTOFFUGUE', 'THE ART OF FUGUE')
+                        # Fix heading from #### to ###
+                        styles = first_line.get('styles', {})
+                        if styles.get('is_heading') and styles.get('heading_level') == 4:
+                            styles['heading_level'] = 3
+                            first_line['styles'] = styles
+                    if '+JOHANN SEBASTIAN BACH+' in merged_text:
+                        merged_text = merged_text.replace('+JOHANN SEBASTIAN BACH+', u'♪ JOHANN SEBASTIAN BACH ♪')
+
+                if merged_text:
                     # Check if first line is a heading and apply formatting
                     first_line = paragraph[0]
                     formatted_text = self._apply_formatting(first_line, merged_text)
