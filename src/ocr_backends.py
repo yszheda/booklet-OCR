@@ -62,8 +62,8 @@ class RapidOCREngine(BaseOCREngine):
 
             if result and result[0]:
                 for item in result[0]:
-                    points, (text, confidence) = item
-
+                    points, text, confidence = item
+                    points, text, confidence = item
                     x_coords = [p[0] for p in points]
                     y_coords = [p[1] for p in points]
 
