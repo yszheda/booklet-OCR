@@ -180,3 +180,21 @@ uv venv --python 3.10 -o .venv-ocr
 # .venv-ocr/Scripts/activate
 # pip install rapidocr-onnxruntime opencv-python pillow natsort
 ```
+
+## Known Issues
+
+1. **Track list formatting**: The first page track listing (tracks 1-20) is merged into a single paragraph instead of being properly listed. This is due to disabled column detection to prevent title splitting.
+
+2. **Word spacing issues**: Some words are joined without spaces (e.g., "counterpointare", "themewhich", "alterationsbecomes"). This requires NLP-based word boundary detection which is not yet implemented.
+
+3. **Markdown formatting**: Reference uses emphasis (*italics*) for titles which our output doesn't include.
+
+4. **Heading levels**: Some headings use #### instead of ### due to conservative detection thresholds.
+
+## Progress
+
+- Feb 24, 2026: Initial debugging and improvements completed
+  - Clean markdown output (no Obsidian features)
+  - Timestamp bracket normalization
+  - Paragraph merging (some spacing issues remain)
+  - Title and centered text formatting with ♪ symbols
