@@ -150,3 +150,33 @@ MIT License - see LICENSE file
 ## Contributing
 
 Contributions welcome! Please read CONTRIBUTING.md before submitting PRs.
+
+## Current Development Status (Feb 2026)
+
+### What's Working:
+- Clean markdown output (Obsidian frontmatter/callouts disabled)
+- Timestamp bracket normalization: {3:10} format  
+- Improved heading detection thresholds
+- Text extraction line by line
+
+### Known Limitations:
+- Track listings from multi-column pages may be merged
+- Paragraphs are line-by-line (not yet merged into flowing text)
+- Centered text with ♪ symbols not yet handled
+- Some headings still incorrectly formatted (#### for non-headings)
+
+### Quick Test:
+```bash
+python src/main.py testcases -o output
+# Compare output/testcases.md with references.md
+```
+
+### Python Environment:
+```bash
+# Using uv for isolated environment (optional):
+pip install uv
+uv venv --python 3.10 -o .venv-ocr
+# Windows:
+# .venv-ocr/Scripts/activate
+# pip install rapidocr-onnxruntime opencv-python pillow natsort
+```
