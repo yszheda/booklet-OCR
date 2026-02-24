@@ -56,10 +56,30 @@ class ObsidianMarkdownGenerator:
                 current_page = page_idx
 
 
-            for text_info in results:
-                formatted = self._format_single_line(text_info)
-                if formatted:
-                    markdown_parts.append(formatted)
+            # Group lines into paragraphs based on y-position gaps
+            paragraphs = self._group_into_paragraphs(results)
+            
+            for paragraph in paragraphs:
+                if not paragraph:
+                    continue
+                # Merge paragraph lines - handle hyphens at line ends
+                texts = [p.get("text", "") for p in paragraph]
+                merged_text = ""
+                for i in range(len(texts)):
+                    if i > 0:
+                        if texts[i-1].rstrip().endswith("-"):
+                            merged_text += texts[i]  # No space after hyphen
+                        else:
+                            merged_text += " " + texts[i]  # Normal space
+                    else:
+                        merged_text = texts[i]
+
+                merged_text = self._clean_text(merged_text)
+                if merged_text:
+                    # Check if first line is a heading and apply formatting
+                    first_line = paragraph[0]
+                    formatted_text = self._apply_formatting(first_line, merged_text)
+                    markdown_parts.append(formatted_text)
                     markdown_parts.append("")
 
         return "\n".join(markdown_parts)
@@ -83,6 +103,48 @@ class ObsidianMarkdownGenerator:
 
         return result
 
+    def _group_into_paragraphs(self, lines: List[Dict]) -> List[List[Dict]]:
+        """Group lines into paragraphs based on y-position gaps"""
+        if not lines:
+            return []
+
+        paragraphs = []
+        current_paragraph = [lines[0]]
+        last_y = lines[0].get("y_position", 0)
+        last_font_size = lines[0].get("font_size", 12)
+
+        for line in lines[1:]:
+            y_pos = line.get("y_position", 0)
+            font_size = line.get("font_size", 12)
+            y_diff = y_pos - last_y
+            expected_gap = last_font_size * 1.5
+
+            # If gap is small relative to line height, same paragraph
+            y_diff_normalized = y_diff / (last_font_size if last_font_size > 0 else 12)
+            if y_diff_normalized < 2.5:
+                current_paragraph.append(line)
+            else:
+                if current_paragraph:
+                    paragraphs.append(current_paragraph)
+                current_paragraph = [line]
+            last_y = y_pos
+            last_font_size = font_size
+
+        if current_paragraph:
+            paragraphs.append(current_paragraph)
+
+        return paragraphs
+
+    def _apply_formatting(self, reference_line: Dict, text: str) -> str:
+        """Apply formatting from reference line to merged text"""
+        styles = reference_line.get("styles", {})
+        result = text
+
+        if styles.get("is_heading") and styles.get("heading_level"):
+            result = f"{'#' * styles['heading_level']} {result}"
+
+        return result
+
     def _clean_text(self, text: str) -> str:
         """Clean OCR artifacts"""
         if not text:
@@ -94,6 +156,17 @@ class ObsidianMarkdownGenerator:
         # Fix bracket/brace confusion: OCR often mixes () [] {}
         # Convert to consistent format for time stamps: {3:10}
         text = re.sub(r"[\(\[\{](\d+):\s*(\d+)[\)\]\}]", r"{\1:\2}", text)
+
+        # Hyphen repair: remove hyphens at line breaks
+        text = re.sub(r"(\w+)-\s+", r"\1 ", text)
+        text = re.sub(r"-\s*$", "", text)
+        # Also remove hyphens between letters (word-break hyphens)
+        text = re.sub(r"([a-zA-Z]+)-([a-zA-Z]+)", r"\1 \2", text)
+
+
+        # Fix words joined without spaces after paragraph merging
+        text = re.sub(r"([a-z])([A-Z][a-z])", r"\1 \2", text)
+
 
 
         text = re.sub(r"\+#\s*$", "", text)
