@@ -76,7 +76,7 @@ def process_booklet(image_dir, output_dir="output", verbose=True):
             try:
                 ocr_results = ocr.process_image(image)
 
-                grouped_results = ocr.group_text_lines(ocr_results, y_threshold=15)
+                grouped_results = ocr.group_text_lines(ocr_results, y_threshold=config.Y_GROUP_THRESHOLD)
 
                 for text_info in grouped_results:
                     text_info["styles"] = ocr.classify_text_style(
