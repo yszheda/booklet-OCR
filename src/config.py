@@ -66,13 +66,12 @@ MIN_CONTOUR_EXTENT = 0.3  # Minimum contour extent (area/bbox_area)
 # =============================================================================
 
 # Heading Detection (based on font size in pixels)
-MIN_HEADING_FONT_SIZE = 36
-
+MIN_HEADING_FONT_SIZE = 48  # Only very large text is heading
 HEADING_SIZE_LEVELS = {
-    1: 48,
-    2: 42,
-    3: 38,
-    4: 36,
+    1: 56,
+    2: 52,
+    3: 48,
+    4: 44,
 }
 
 # Bold Text Detection (based on stroke width analysis)
@@ -113,11 +112,9 @@ PARAGRAPH_GAP_THRESHOLD = 50  # Increased for better paragraph detection in doub
 OUTPUT_DIR = "output"  # Default output directory for generated markdown files
 
 # Obsidian Frontmatter (YAML metadata)
-OBSIDIAN_FRONTMATTER = True  # Include YAML frontmatter at file top
+OBSIDIAN_FRONTMATTER = False  # Disabled for cleaner output
 # Contains: created/modified dates, unique ID, tags, etc.
-
-# Obsidian Callouts (colored info boxes)
-ENABLE_CALLOUTS = True  # Use Obsidian callout format for page images
+ENABLE_CALLOUTS = False  # Disabled for cleaner output
 # Example: "> [!info]- Page 1 Image\n> ![[page_01.png]]"
 
 PRESERVE_LINE_BREAKS = True  # Preserve explicit line breaks in output
@@ -132,7 +129,7 @@ DETECT_CHAPTERS = True  # Auto-detect chapter headings for organization
 CHAPTER_HEADING_LEVELS = [1, 2]  # Markdown heading levels treated as chapters  # Markdown heading levels treated as chapters
 
 # Markdown Formatting
-IMPROVE_READABILITY = True  # Add spacing and structure for readability
+IMPROVE_READABILITY = False  # Disabled for cleaner output
 # - Extra blank lines between paragraphs
 # - Consistent list formatting
 # - Heading hierarchy maintained
@@ -192,5 +189,5 @@ DOCUMENT_TYPE = "booklet"  # Document type for frontmatter
 # Options: 'booklet', 'brochure', 'manual', 'flyer', 'leaflet'
 
 # Show source image in output
-EMBED_SOURCE_IMAGES = True  # Include image links in markdown
+EMBED_SOURCE_IMAGES = False  # Disabled for cleaner output
 # Format: ![[relative/path/image.png]]

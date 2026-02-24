@@ -15,7 +15,7 @@ if sys.platform == "win32":
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from ocr_processor import BookletOCR
+from rapidocr_processor import RapidBookletOCR
 from image_utils import get_image_files, load_image, validate_directory
 from markdown_generator import ObsidianMarkdownGenerator
 import config
@@ -50,7 +50,7 @@ def process_booklet(image_dir, output_dir="output", verbose=True):
         # Get sorted image files
         image_files = get_image_files(image_dir)
 
-        ocr = BookletOCR(lang=config.OCR_LANGUAGE, use_gpu=config.OCR_USE_GPU)
+        ocr = RapidBookletOCR(lang=config.OCR_LANGUAGE)
 
         markdown_gen = ObsidianMarkdownGenerator(
             frontmatter=config.OBSIDIAN_FRONTMATTER,
