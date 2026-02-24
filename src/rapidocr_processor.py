@@ -95,6 +95,9 @@ class RapidBookletOCR:
             return [region]
 
         
+        # Temporarily disable column detection to avoid title splitting
+        # TODO: Implement smarter column detection that respects page sections
+        return [region]
         region_img = image[y : y + h, x : x + w]
         gray = (
             cv2.cvtColor(region_img, cv2.COLOR_RGB2GRAY)
