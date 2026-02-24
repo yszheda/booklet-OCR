@@ -50,7 +50,7 @@ PAGE_SPLIT_THRESHOLD = 0.1  # Vertical projection threshold for page splitting
 MIN_PAGE_HEIGHT_RATIO = 0.1  # Minimum page height as ratio of image height
 
 # Column Detection Settings
-COLUMN_GAP_THRESHOLD = 0.05  # Minimum gap width ratio for column separation
+COLUMN_GAP_THRESHOLD = 0.08  # Increased to avoid over-splitting columns in double-page spreads  # Minimum gap width ratio for column separation
 MIN_COLUMN_WIDTH_RATIO = 0.1  # Minimum column width ratio
 MAX_COLUMNS = 3  # Maximum number of columns to detect
 
@@ -98,11 +98,11 @@ ITALIC_MAX_ANGLE = 45  # Maximum slant angle (degrees)
 # TEXT GROUPING & LAYOUT ANALYSIS
 # =============================================================================
 
-Y_GROUP_THRESHOLD = 15  # Vertical threshold for line grouping (pixels)
+Y_GROUP_THRESHOLD = 30  # Vertical threshold - increased for double-page spreads for line grouping (pixels)
 # Text blocks within this Y distance are treated as same line
-# Adjust for line spacing: tight spacing → lower value (10-12)
+# Increased from 15 to handle double-page spreads with no page gap
 
-PARAGRAPH_GAP_THRESHOLD = 30  # Vertical gap for paragraph separation (pixels)
+PARAGRAPH_GAP_THRESHOLD = 50  # Increased for better paragraph detection in double-page spreads  # Vertical gap for paragraph separation (pixels)
 # Gaps larger than this create new paragraphs
 # Adjust for paragraph spacing: wide spacing → higher value (35-40)
 

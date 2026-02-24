@@ -546,10 +546,38 @@ class BookletOCR:
         return grouped_lines
 
     def _merge_line(self, line_texts: List[Dict]) -> Dict:
+        """Merge text blocks into a single line with smart horizontal gap handling."""
         if len(line_texts) == 1:
             return line_texts[0]
 
-        combined_text = " ".join(t["text"] for t in line_texts)
+        # Sort by x-position for proper ordering
+        line_texts = sorted(line_texts, key=lambda x: x["bbox"][0])
+
+        # Calculate average font size for gap threshold
+        avg_font_size = sum(t.get("font_size", 20) for t in line_texts) / len(line_texts)
+        horizontal_gap_threshold = avg_font_size * 1.5  # Allow gaps up to 1.5x font size
+
+        # Merge with smart horizontal gap handling
+        text_parts = []
+        prev_x_end = None
+
+        for text_info in line_texts:
+            text = text_info["text"].strip()
+            x, y, w, h = text_info["bbox"]
+            x_end = x + w
+
+            if prev_x_end is not None:
+                gap = x - prev_x_end
+                # Use single space if gap is small enough, otherwise add extra spacing
+                if gap <= horizontal_gap_threshold:
+                    text_parts.append(" ")
+                else:
+                    text_parts.append("  ")
+
+            text_parts.append(text)
+            prev_x_end = x_end
+
+        combined_text = "".join(text_parts).strip()
 
         x_min = min(t["bbox"][0] for t in line_texts)
         y_min = min(t["bbox"][1] for t in line_texts)
