@@ -17,6 +17,9 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent))
 
 import config
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class HybridOCR:
@@ -41,8 +44,8 @@ class HybridOCR:
             self.pymupdf4llm_available = True
         except ImportError:
             if config.USE_HYBRID_OCR:
-                print(
-                    "Warning: PyMuPDF4LLM not available. "
+                logger.warning(
+                    "PyMuPDF4LLM not available. "
                     "PDF files will be processed as images. "
                     "Install: pip install pymupdf4llm"
                 )
@@ -55,7 +58,7 @@ class HybridOCR:
                 lang=self.tesseract_lang, use_gpu=config.OCR_USE_GPU
             )
         except Exception as e:
-            print(f"Error loading Tesseract OCR: {e}")
+            logger.error(f"Error loading Tesseract OCR: {e}")
 
     def detect_input_type(self, path: Union[str, Path]) -> str:
         path = Path(path)

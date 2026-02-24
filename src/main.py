@@ -19,6 +19,9 @@ from ocr_processor import BookletOCR
 from image_utils import get_image_files, load_image, validate_directory
 from markdown_generator import ObsidianMarkdownGenerator
 import config
+from logger import setup_logging, get_logger
+
+logger = get_logger(__name__)
 
 
 def process_booklet(image_dir, output_dir="output", verbose=True):
@@ -31,37 +34,38 @@ def process_booklet(image_dir, output_dir="output", verbose=True):
         verbose: Show progress messages
     """
     try:
-        # Validate input directory
+        setup_logging(
+            log_level=config.LOG_LEVEL,
+            log_file=config.LOG_FILE,
+            log_to_console=config.LOG_TO_CONSOLE,
+            use_colors=config.LOG_USE_COLORS,
+        )
+
+        logger = get_logger(__name__)
+
         num_images = validate_directory(image_dir)
         if verbose:
-            print(f"Found {num_images} images in {image_dir}")
+            logger.info(f"Found {num_images} images in {image_dir}")
 
         # Get sorted image files
         image_files = get_image_files(image_dir)
 
-        # Initialize OCR processor
-        if verbose:
-            print("Initializing OCR processor...")
-
         ocr = BookletOCR(lang=config.OCR_LANGUAGE, use_gpu=config.OCR_USE_GPU)
 
-        # Initialize markdown generator
         markdown_gen = ObsidianMarkdownGenerator(
             frontmatter=config.OBSIDIAN_FRONTMATTER,
             enable_callouts=config.ENABLE_CALLOUTS,
         )
 
-        # Process each image
         if verbose:
-            print("\nProcessing images...")
+            logger.info("Processing images...")
 
         images_data = []
 
         for idx, image_path in enumerate(image_files, 1):
             if verbose:
-                print(f"[{idx}/{len(image_files)}] Processing: {image_path.name}")
+                logger.info(f"[{idx}/{len(image_files)}] Processing: {image_path.name}")
 
-            # Load image
             image = load_image(image_path)
             if image is None:
                 images_data.append(
@@ -69,7 +73,6 @@ def process_booklet(image_dir, output_dir="output", verbose=True):
                 )
                 continue
 
-            # Process with OCR
             try:
                 ocr_results = ocr.process_image(image)
 
@@ -89,39 +92,36 @@ def process_booklet(image_dir, output_dir="output", verbose=True):
                 )
 
                 if verbose:
-                    print(f"  Detected {len(grouped_results)} text lines")
+                    logger.info(f"  Detected {len(grouped_results)} text lines")
 
             except Exception as e:
                 if verbose:
-                    print(f"  ✗ Error: {e}")
+                    logger.error(f"  Error: {e}")
                 images_data.append({"image_path": str(image_path), "error": str(e)})
 
-        # Create output directory
         os.makedirs(output_dir, exist_ok=True)
 
-        # Generate output path
         source_name = Path(image_dir).name
         output_path = os.path.join(output_dir, f"{source_name}.md")
 
-        # Generate markdown
         if verbose:
-            print(f"\nGenerating Obsidian Markdown...")
+            logger.info("Generating Obsidian Markdown...")
 
         markdown_gen.generate(images_data, output_path, image_dir)
 
         if verbose:
-            print(f"\n✓ Successfully generated: {output_path}")
-            print(f"✓ Processed {len(images_data)} pages")
+            logger.info(f"Successfully generated: {output_path}")
+            logger.info(f"Processed {len(images_data)} pages")
 
             total_texts = sum(
                 img.get("num_texts", 0) for img in images_data if "num_texts" in img
             )
-            print(f"✓ Total text blocks detected: {total_texts}")
+            logger.info(f"Total text blocks detected: {total_texts}")
 
         return output_path
 
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        logger.error(f"Error: {e}")
         import traceback
 
         traceback.print_exc()
@@ -157,14 +157,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Override config if flags provided
     if args.no_footmatter:
         config.OBSIDIAN_FRONTMATTER = False
 
     if args.no_callouts:
         config.ENABLE_CALLOUTS = False
 
-    # Process booklet
     output_file = process_booklet(
         args.input_dir,
         output_dir=args.output,
@@ -172,10 +170,10 @@ def main():
     )
 
     if output_file:
-        print(f"\n✅ Done! Open the file in Obsidian: {output_file}")
+        logger.info(f"Done! Open the file in Obsidian: {output_file}")
         return 0
     else:
-        print(f"\n❌ Failed to process booklet")
+        logger.error("Failed to process booklet")
         return 1
 
 

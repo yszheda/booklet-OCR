@@ -7,6 +7,9 @@ from pathlib import Path
 import os
 import re
 import config
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 try:
     from layout_analyzer import LayoutAnalyzer
@@ -167,7 +170,7 @@ class BookletOCR:
                 config="--psm 6",
             )
         except Exception as e:
-            print(f"OCR error: {e}")
+            logger.error(f"OCR error: {e}")
             return []
 
         texts_with_style = []

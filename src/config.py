@@ -5,6 +5,18 @@ and output formatting options for the CD Booklet OCR system.
 """
 
 # =============================================================================
+# LOGGING SETTINGS
+# =============================================================================
+
+LOG_LEVEL = "INFO"
+
+LOG_FILE = None
+
+LOG_TO_CONSOLE = True
+
+LOG_USE_COLORS = True
+
+# =============================================================================
 # OCR ENGINE SETTINGS
 # =============================================================================
 
@@ -117,7 +129,7 @@ CLEAN_OCR_ARTIFACTS = True  # Remove OCR noise (double lines, special chars)
 # Page Organization
 ENABLE_PAGE_BREAKS = True  # Add markers between processed pages
 DETECT_CHAPTERS = True  # Auto-detect chapter headings for organization
-CHAPTER_HEADING_LEVELS = ["1", "2"]  # Markdown heading levels treated as chapters
+CHAPTER_HEADING_LEVELS = [1, 2]  # Markdown heading levels treated as chapters  # Markdown heading levels treated as chapters
 
 # Markdown Formatting
 IMPROVE_READABILITY = True  # Add spacing and structure for readability

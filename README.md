@@ -64,6 +64,14 @@ python src/main.py ./scan --no-footmatter
 
 ### 编辑 `src/config.py`
 
+#### 日志配置
+```python
+LOG_LEVEL = "INFO"  # 日志级别: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOG_FILE = None  # 日志文件路径 (None表示不写入文件)
+LOG_TO_CONSOLE = True  # 是否输出到控制台
+LOG_USE_COLORS = True  # 是否使用彩色输出（仅限控制台）
+```
+
 #### 语言设置
 ```python
 OCR_LANGUAGE = "ch"  # 'ch' = 中文, 'en' = 英文
@@ -203,6 +211,17 @@ booklet-OCR/
 ```
 
 ## 故障排除
+
+### 日志调试
+如果遇到问题，可以启用调试日志来查看详细信息：
+
+```python
+# 在 config.py 中设置
+LOG_LEVEL = "DEBUG"  # 显示所有日志
+LOG_FILE = "debug.log"  # 同时保存到日志文件
+```
+
+运行程序后，查看日志文件了解详细执行过程。
 
 ### Tesseract未找到
 ```bash

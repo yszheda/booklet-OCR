@@ -26,9 +26,9 @@ class ObsidianMarkdownGenerator:
                 heading_level = (
                     config.CHAPTER_HEADING_LEVELS[0]
                     if config.CHAPTER_HEADING_LEVELS
-                    else "2"
+                    else 2
                 )
-                f.write(f"#{heading_level} Document Information\n\n")
+                f.write(f"#{'#' * (heading_level - 1)} Document Information\n\n")
                 f.write(f"**Source:** `{source_dir}`\n")
                 f.write(
                     f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
@@ -348,8 +348,10 @@ class ObsidianMarkdownGenerator:
         text = re.sub(r"[\u2010-\u2015]{2,}", "-", text)
         text = re.sub(r"\s+([.,!?;:])", r"\1", text)
         text = re.sub(r"([.,!?;:])([^\s.,!?;:])", r"\1 \2", text)
-        text = re.sub(r"\s[©®™]\s", " ", text)
+        text = re.sub(r"s[©®TM+]s", " ", text)
 
+        text = re.sub(r"\+#\s*$", "", text)
+        text = re.sub(r"\+\*\s*$", "", text)
         return text.strip()
 
     def _detect_page_callout_type(self, image_data: Dict) -> str:
@@ -418,3 +420,13 @@ def format_text_block(text_info, min_heading_size=24):
         text = f"<center>{text}</center>"
 
     return text
+
+    """Clean specific OCR artifacts like +# +* etc"""
+    text = re.sub(r'\+#\s*$', '', text)
+    text = re.sub(r'\+\*\s*$', '', text)
+    text = re.sub(r'^\+#\s*', '', text)
+    text = re.sub(r'^\+\*\s*', '', text)
+    return text.strip()
+
+    return result
+

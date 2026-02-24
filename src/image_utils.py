@@ -4,6 +4,9 @@ import os
 from pathlib import Path
 from PIL import Image
 from natsort import natsorted
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_image_files(directory):
@@ -27,12 +30,11 @@ def load_image(image_path):
     """
     try:
         image = Image.open(image_path)
-        # Convert RGB
         if image.mode != "RGB":
             image = image.convert("RGB")
         return image
     except Exception as e:
-        print(f"Error loading {image_path}: {e}")
+        logger.error(f"Error loading {image_path}: {e}")
         return None
 
 
