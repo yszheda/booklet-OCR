@@ -8,7 +8,7 @@ Convert CD booklet images from PDF screenshots to Obsidian-compatible Markdown w
 - 🔍 **Multiple OCR Engines**: Support for Tesseract, RapidOCR, EasyOCR, PaddleOCR
 - 📝 **Smart Formatting**: Automatic heading detection, list formatting, paragraph grouping
 - 🎯 **Style Preservation**: Bold, italic, centered text, headings
-- 🔖 **Obsidian Ready**: Frontmatter metadata, callouts, linked images
+- 🔖 **Obsidian Ready**: Clean markdown output (no Obsidian-specific features by default)
 - 🌍 **Multilingual**: Support for Chinese, English, and 80+ languages
 
 ## Quick Start
@@ -31,14 +31,11 @@ See [docs/INSTALLATION.md](docs/INSTALLATION.md) for detailed installation instr
 ### Basic Usage
 
 ```bash
-# Process images in a directory
-python src/main.py testcases -o output
+# Process images in a directory  
+python src/main.py data/testcases -o output
 
-# Use different OCR engine
-python src/main.py testcases -o output --ocr-backend rapidocr
-
-# Specify language
-python src/main.py testcases -o output --lang ch
+# Compare output with reference
+diff -u data/references/references.md output/testcases.md
 ```
 
 ## OCR Engine Comparison
@@ -85,90 +82,65 @@ ENABLE_LAYOUT_ANALYSIS = True
 Y_GROUP_THRESHOLD = 30  # Pixels for line grouping
 
 # Output Settings
-OBSIDIAN_FRONTMATTER = True
-EMBED_SOURCE_IMAGES = True
-IMPROVE_READABILITY = True
+OBSIDIAN_FRONTMATTER = False  # Disabled for clean output
+EMBED_SOURCE_IMAGES = False  # Disabled for clean output
+IMPROVE_READABILITY = False  # Disabled for clean output
 ```
 
 ## Output Example
 
 ```markdown
----
-created: 2024-02-24T00:00:00Z
-id: booklet_abc123
-tags: [ocr, booklet, cd-doc]
----
+#### THE ART OF FUGUE is Bach's final major instrumental composition and a farewell testament for the ages. It is an ordered set of fourteen fugues and four canons, all deriving from a single theme, and all sharing the same key of D minor.
 
-# The Art of Fugue
-
-1 Contrapunctus 1 {3:10}
-2 Contrapunctus 2 {2:27}
-3 Contrapunctus 3 {2:56}
+To see The Art of Fugue clearly for what it is, a description of the other above-mentioned monuments will help us.
 ```
 
 ## Development
-
-### Running Tests
-
-```bash
-python run_tests.py
-```
 
 ### Code Structure
 
 ```
 booklet-OCR/
 ├── src/
-│   ├── main.py              # Main CLI
-│   ├── ocr_processor.py     # Tesseract OCR
-│   ├── ocr_backends.py      # Multi-engine support
-│   ├── layout_analyzer.py   # Layout detection
-│   ├── markdown_generator.py # Markdown output
-│   └── config.py            # Configuration
-├── tests/
-│   ├── test_*.py           # Unit tests
-└── testcases/              # Sample images
+│   ├── main.py              # Main CLI entry point
+│   ├── rapidocr_processor.py # RapidOCR engine integration
+│   ├── markdown_generator.py  # Markdown output generator
+│   ├── layout_analyzer.py    # Layout detection
+│   ├── config.py             # Configuration settings
+│   ├── image_utils.py        # Image I/O utilities
+│   ├── logger.py             # Logging setup
+│   ├── hybrid_ocr.py         # Multi-engine support
+│   └── ocr_processor.py      # Tesseract OCR (legacy)
+├── data/
+│   ├── testcases/           # Test image input
+│   └── references/          # Expected output references
+├── tests/                   # Unit tests
+├── tools/                   # Utility scripts
+├── docs/                    # Documentation
+├── output/                  # Generated output (gitignored)
+└── requirements.txt         # Python dependencies
 ```
-
-## Troubleshooting
-
-See [docs/INSTALLATION.md](docs/INSTALLATION.md) for installation issues and [docs/OCR_ENGINES.md](docs/OCR_ENGINES.md) for OCR engine-specific problems.
-
-## Roadmap
-
-- [x] Multiple OCR engine support
-- [x] Layout-aware text grouping
-- [x] Style preservation (bold, italic, headings)
-- [ ] ML-based page boundary detection for double-page spreads
-- [ ] Language auto-detection
-- [ ] Output to other formats (DOCX, TXT)
-
-## License
-
-MIT License - see LICENSE file
-
-## Contributing
-
-Contributions welcome! Please read CONTRIBUTING.md before submitting PRs.
 
 ## Current Development Status (Feb 2026)
 
 ### What's Working:
-- Clean markdown output (Obsidian frontmatter/callouts disabled)
-- Timestamp bracket normalization: {3:10} format  
-- Improved heading detection thresholds
-- Text extraction line by line
+- Clean markdown output (no Obsidian features)
+- Timestamp bracket normalization: {3:10} format
+- Paragraph merging (text flows as continuous paragraphs)
+- Title and centered text formatting with ♪ symbols
+- Hyphen repair for line breaks
 
 ### Known Limitations:
-- Track listings from multi-column pages may be merged
-- Paragraphs are line-by-line (not yet merged into flowing text)
-- Centered text with ♪ symbols not yet handled
-- Some headings still incorrectly formatted (#### for non-headings)
+- Track listings from multi-column pages may be merged (column detection disabled)
+- Some word spacing issues (e.g., "counterpointare", "themewhich") - requires NLP
+- Missing markdown emphasis (*italics*) for titles
+- Some headings use #### instead of ### due to conservative detection
 
 ### Quick Test:
 ```bash
-python src/main.py testcases -o output
-# Compare output/testcases.md with references.md
+python src/main.py data/testcases -o output
+# Compare output with reference
+diff -u data/references/references.md output/testcases.md
 ```
 
 ### Python Environment:
@@ -181,20 +153,10 @@ uv venv --python 3.10 -o .venv-ocr
 # pip install rapidocr-onnxruntime opencv-python pillow natsort
 ```
 
-## Known Issues
+## License
 
-1. **Track list formatting**: The first page track listing (tracks 1-20) is merged into a single paragraph instead of being properly listed. This is due to disabled column detection to prevent title splitting.
+MIT License - see LICENSE file
 
-2. **Word spacing issues**: Some words are joined without spaces (e.g., "counterpointare", "themewhich", "alterationsbecomes"). This requires NLP-based word boundary detection which is not yet implemented.
+## Contributing
 
-3. **Markdown formatting**: Reference uses emphasis (*italics*) for titles which our output doesn't include.
-
-4. **Heading levels**: Some headings use #### instead of ### due to conservative detection thresholds.
-
-## Progress
-
-- Feb 24, 2026: Initial debugging and improvements completed
-  - Clean markdown output (no Obsidian features)
-  - Timestamp bracket normalization
-  - Paragraph merging (some spacing issues remain)
-  - Title and centered text formatting with ♪ symbols
+Contributions welcome! Please read CONTRIBUTING.md before submitting PRs.

@@ -1,6 +1,13 @@
 # Output directories
 output/
-output_single/
+output_*/
+output_debug/
+output_final/
+output_test/
+
+# Test images (keep originals, ignore processed)
+!testcases/
+tests/__pycache__/
 
 # Python
 __pycache__/
@@ -39,19 +46,41 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Temporary files
 *.tmp
 *.temp
 nul
+*.log
 
-# Test outputs
-tests/test_output/
-output_tests*/
+# Debug files
+debug_*.py
+test_*.py
+simple_debug.py
+analyze_*.py
+check_*.py
+compare_*.py
+extract_*.py
+
+# Core source files that should not be in repo
+rapidocr_test*.py
+ocr_translator.py
+run_tests.py
 
 # Python cache
 .ruff_cache/
 .mypy_cache/
 
-# Debug files
-debug_*.py
+# Backup files
+*.bak
+*.backup
+
+# Cache directories
+.cache/
+
+# Large temporary files (images not in use)
+!testcases/*.jpg
+*.jpg
+*.png
+!testcases/
